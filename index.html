@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>插画壁纸 · 悬浮时钟 & 一言</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <div class="wallpaper">
+        <div class="wallpaper-bg"></div>
+        <div class="wallpaper-overlay"></div>
+        <div class="art-brush art-brush--1"></div>
+        <div class="art-brush art-brush--2"></div>
+        <div class="art-brush art-brush--3"></div>
+    </div>
+
+    <div class="ui-layer">
+        <div class="clock-wrapper">
+            <div class="clock" id="clock" aria-label="数字时钟">
+                <span class="time-segment" id="hours">00</span>
+                <span class="colon">:</span>
+                <span class="time-segment" id="minutes">00</span>
+                <span class="colon">:</span>
+                <span class="time-segment" id="seconds">00</span>
+            </div>
+            <div class="clock-underline"></div>
+        </div>
+
+        <div class="hitokoto-wrapper" id="hitokotoWrapper" title="点击刷新一言">
+            <div class="hitokoto loading" id="hitokoto">
+                <span class="quote-mark">"</span>
+                <span class="text" id="hitokotoText">加载中</span>
+                <span class="quote-mark">"</span>
+                <span class="from" id="hitokotoFrom"></span>
+                <span class="hint">✦ 点击刷新</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-meta">✦ 插画壁纸 · 悬浮时钟</div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
