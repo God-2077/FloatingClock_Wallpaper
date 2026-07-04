@@ -2,7 +2,7 @@ const WALLPAPER_CONFIG = {
     mode: 'carousel',          // 'default' | 'online' | 'carousel'
     onlineUrl: '',            // mode='online' 时填写
     carouselUrls: ['https://t.alcy.cc/ycy'],         // mode='carousel' 时填写
-    carouselInterval: 3000,  // 轮播间隔(ms)
+    carouselInterval: 60 * 1000,  // 轮播间隔(ms)
 };
 
 (function () {
