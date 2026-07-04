@@ -38,7 +38,30 @@
             hitokotoEl.classList.remove('loading');
             hitokotoText.textContent = '……';
 
-            const res = await fetch('https://v1.hitokoto.cn/?c=d&c=k&c=h&c=i&c=j&encode=json');
+            // 1. 定义键值对数组（每个分类一个 [ 'c', 值 ]）
+            const params = [
+                ['c', 'a'],   // 动画
+                ['c', 'b'],   // 漫画
+                ['c', 'c'],   // 游戏
+                ['c', 'd'],   // 文学
+                ['c', 'f'],   // 来自网络
+                ['c', 'h'],   // 影视
+                ['c', 'i'],   // 诗词
+                ['c', 'j'],   // 网易云
+                ['c', 'k'],   // 哲学
+                ['c', 'l'],   // 抖机灵
+                ['encode', 'json']
+            ];
+
+            // 2. 用数组创建 URLSearchParams 实例
+            const searchParams = new URLSearchParams(params);
+
+            // 3. 拼接至基础 URL
+            const baseApi = new URL('https://v1.hitokoto.cn/');
+            baseApi.search = searchParams.toString();
+
+            const res = await fetch(baseApi.toString());
+
             if (!res.ok) throw new Error('API 响应异常');
 
             const data = await res.json();
