@@ -35,9 +35,9 @@
 
     async function fetchHitokoto() {
         try {
-            hitokotoEl.classList.add('loading');
-            hitokotoText.textContent = '……';
-            hitokotoFrom.textContent = '';
+            if (!hitokotoEl.classList.contains('hidden')) {
+                hitokotoEl.classList.add('loading');
+            }
 
             const params = [
                 ['c', 'a'],
@@ -66,24 +66,21 @@
             const text = data.hitokoto || '生活明朗，万物可爱。';
             const from = data.from ? `—— ${data.from}` : '';
 
+            hitokotoEl.classList.remove('loading', 'hidden');
             hitokotoText.textContent = text;
             hitokotoFrom.textContent = from;
-
-            hitokotoEl.classList.remove('loading');
-            requestAnimationFrame(() => {
-                hitokotoEl.classList.remove('hidden');
-            });
+            hitokotoEl.classList.add('entering');
+            hitokotoEl.addEventListener('animationend', function onEnterEnd() {
+                hitokotoEl.classList.remove('entering');
+            }, { once: true });
 
             console.log(`一言: "${text}"，${from}`);
 
         } catch (err) {
             console.warn('一言加载失败，使用备用句子', err);
+            hitokotoEl.classList.remove('loading', 'hidden');
             hitokotoText.textContent = '且听风吟，静待花开。';
             hitokotoFrom.textContent = '';
-            hitokotoEl.classList.remove('loading');
-            requestAnimationFrame(() => {
-                hitokotoEl.classList.remove('hidden');
-            });
         }
     }
 
@@ -91,19 +88,7 @@
 
     hitokotoWrapper.addEventListener('click', function (e) {
         e.stopPropagation();
-        if (hitokotoEl.classList.contains('leaving') || hitokotoEl.classList.contains('hidden')) return;
-
-        hitokotoEl.classList.add('leaving');
-
-        function onLeaveEnd(ev) {
-            if (ev.propertyName !== 'opacity') return;
-            hitokotoEl.removeEventListener('transitionend', onLeaveEnd);
-            hitokotoEl.classList.remove('leaving');
-            hitokotoEl.classList.add('hidden');
-            fetchHitokoto();
-        }
-
-        hitokotoEl.addEventListener('transitionend', onLeaveEnd);
+        fetchHitokoto();
     });
 
     document.addEventListener('keydown', function (e) {

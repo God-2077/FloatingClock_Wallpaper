@@ -240,13 +240,6 @@ body {
     font-family: 'Inter', 'Noto Serif SC', sans-serif;
 }
 
-.hitokoto.leaving {
-    opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 0.25s ease-in, transform 0.25s ease-in;
-    pointer-events: none;
-}
-
 .hitokoto.hidden {
     opacity: 0;
     transform: translateY(4px);
@@ -260,6 +253,15 @@ body {
 @keyframes dotBreathe {
     0%, 100% { opacity: 0.25; }
     50% { opacity: 0.55; }
+}
+
+@keyframes hitokotoEnter {
+    0% { opacity: 0.3; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.hitokoto.entering {
+    animation: hitokotoEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ===== 底部信息 ===== */
