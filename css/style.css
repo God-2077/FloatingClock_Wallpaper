@@ -30,7 +30,7 @@ body {
     position: absolute;
     inset: 0;
     background:
-        url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1920&q=80') center / cover no-repeat;
+        url('/img/default-2048.jpg') center / cover no-repeat;
     filter: saturate(1.1) contrast(1.05);
     transition: filter 0.6s ease;
 }
