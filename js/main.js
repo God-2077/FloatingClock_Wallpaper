@@ -10,6 +10,8 @@
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
 
+    const AUTO_REFRESH_INTERVAL = 1000 * 60;
+
     VanillaTilt.init(clockEl, {
         max: 2,
         speed: 300,
@@ -33,9 +35,9 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    async function fetchHitokoto() {
+    async function fetchHitokoto(isAuto = false) {
         try {
-            if (!hitokotoEl.classList.contains('hidden')) {
+            if (!hitokotoEl.classList.contains('hidden') && !isAuto) {
                 hitokotoEl.classList.add('loading');
             }
 
@@ -69,9 +71,11 @@
             hitokotoEl.classList.remove('loading', 'hidden');
             hitokotoText.textContent = text;
             hitokotoFrom.textContent = from;
-            hitokotoEl.classList.add('entering');
+
+            const enterClass = isAuto ? 'entering-auto' : 'entering';
+            hitokotoEl.classList.add(enterClass);
             hitokotoEl.addEventListener('animationend', function onEnterEnd() {
-                hitokotoEl.classList.remove('entering');
+                hitokotoEl.classList.remove(enterClass);
             }, { once: true });
 
             console.log(`一言: "${text}"，${from}`);
@@ -86,8 +90,25 @@
 
     fetchHitokoto();
 
+    let autoTimer = null;
+
+    function startAutoRefresh() {
+        if (AUTO_REFRESH_INTERVAL <= 0) return;
+        autoTimer = setInterval(() => fetchHitokoto(true), AUTO_REFRESH_INTERVAL);
+    }
+
+    function resetAutoRefresh() {
+        if (autoTimer !== null) {
+            clearInterval(autoTimer);
+            startAutoRefresh();
+        }
+    }
+
+    startAutoRefresh();
+
     hitokotoWrapper.addEventListener('click', function (e) {
         e.stopPropagation();
+        resetAutoRefresh();
         fetchHitokoto();
     });
 

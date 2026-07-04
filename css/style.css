@@ -264,6 +264,16 @@ body {
     animation: hitokotoEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes hitokotoEnterAuto {
+    0% { transform: translateY(4px); }
+    100% { transform: translateY(0); }
+}
+
+.hitokoto.entering-auto {
+    animation: hitokotoEnterAuto 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: none;
+}
+
 /* ===== 底部信息 ===== */
 .footer-meta {
     position: fixed;
