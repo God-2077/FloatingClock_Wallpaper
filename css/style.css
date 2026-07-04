@@ -100,6 +100,9 @@ body {
     align-items: center;
     width: 100%;
     margin-top: -5vh;
+    transform-style: preserve-3d;
+    transform: perspective(800px);
+
 }
 
 .clock {
@@ -121,6 +124,8 @@ body {
     padding: 0.1em 0.4em;
     border-radius: 0.2em;
     background: rgba(0, 0, 0, 0.08);
+    transform-style: preserve-3d;
+    pointer-events: auto;
 }
 
 .clock .time-segment {
@@ -350,6 +355,11 @@ body {
     pointer-events: none;
     font-family: 'Inter', sans-serif;
 }
+/* ===== vanilla-tilt 光泽层 ===== */
+.clock .js-tilt-glare {
+    border-radius: 0.2em;
+}
+
 @media (max-width: 640px) {
     .hitokoto .hint {
         display: none;

@@ -10,6 +10,15 @@
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
 
+    VanillaTilt.init(clockEl, {
+        max: 2,
+        speed: 300,
+        scale: 1.01,
+        glare: true,
+        'max-glare': 0.15,
+        perspective: 1000,
+    });
+
     function updateClock() {
         const now = new Date();
         const h = String(now.getHours()).padStart(2, '0');
