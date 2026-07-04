@@ -35,28 +35,26 @@
 
     async function fetchHitokoto() {
         try {
-            hitokotoEl.classList.remove('loading');
+            hitokotoEl.classList.add('loading');
             hitokotoText.textContent = '……';
+            hitokotoFrom.textContent = '';
 
-            // 1. 定义键值对数组（每个分类一个 [ 'c', 值 ]）
             const params = [
-                ['c', 'a'],   // 动画
-                ['c', 'b'],   // 漫画
-                ['c', 'c'],   // 游戏
-                ['c', 'd'],   // 文学
-                ['c', 'f'],   // 来自网络
-                ['c', 'h'],   // 影视
-                ['c', 'i'],   // 诗词
-                ['c', 'j'],   // 网易云
-                ['c', 'k'],   // 哲学
-                ['c', 'l'],   // 抖机灵
+                ['c', 'a'],
+                ['c', 'b'],
+                ['c', 'c'],
+                ['c', 'd'],
+                ['c', 'f'],
+                ['c', 'h'],
+                ['c', 'i'],
+                ['c', 'j'],
+                ['c', 'k'],
+                ['c', 'l'],
                 ['encode', 'json']
             ];
 
-            // 2. 用数组创建 URLSearchParams 实例
             const searchParams = new URLSearchParams(params);
 
-            // 3. 拼接至基础 URL
             const baseApi = new URL('https://v1.hitokoto.cn/');
             baseApi.search = searchParams.toString();
 
@@ -71,22 +69,21 @@
             hitokotoText.textContent = text;
             hitokotoFrom.textContent = from;
 
-            hitokotoEl.style.transition = 'opacity 0.3s, transform 0.3s';
-            hitokotoEl.style.opacity = '0.7';
-            hitokotoEl.style.transform = 'scale(0.98)';
+            hitokotoEl.classList.remove('loading');
             requestAnimationFrame(() => {
-                hitokotoEl.style.opacity = '1';
-                hitokotoEl.style.transform = 'scale(1)';
+                hitokotoEl.classList.remove('hidden');
             });
 
-            // 打印一言到控制台
-            console.log(`📌 一言: "${text}"，${from}`);
+            console.log(`一言: "${text}"，${from}`);
 
         } catch (err) {
             console.warn('一言加载失败，使用备用句子', err);
             hitokotoText.textContent = '且听风吟，静待花开。';
             hitokotoFrom.textContent = '';
             hitokotoEl.classList.remove('loading');
+            requestAnimationFrame(() => {
+                hitokotoEl.classList.remove('hidden');
+            });
         }
     }
 
@@ -94,11 +91,19 @@
 
     hitokotoWrapper.addEventListener('click', function (e) {
         e.stopPropagation();
-        hitokotoEl.style.transition = 'opacity 0.15s';
-        hitokotoEl.style.opacity = '0.4';
-        setTimeout(() => {
+        if (hitokotoEl.classList.contains('leaving') || hitokotoEl.classList.contains('hidden')) return;
+
+        hitokotoEl.classList.add('leaving');
+
+        function onLeaveEnd(ev) {
+            if (ev.propertyName !== 'opacity') return;
+            hitokotoEl.removeEventListener('transitionend', onLeaveEnd);
+            hitokotoEl.classList.remove('leaving');
+            hitokotoEl.classList.add('hidden');
             fetchHitokoto();
-        }, 180);
+        }
+
+        hitokotoEl.addEventListener('transitionend', onLeaveEnd);
     });
 
     document.addEventListener('keydown', function (e) {
