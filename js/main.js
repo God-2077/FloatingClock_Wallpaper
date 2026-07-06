@@ -126,7 +126,8 @@ let CONFIG = {
     updateClock();
     setInterval(updateClock, 1000);
 
-    function updateHitokoto(data) {
+    function updateHitokoto(data, isAuto) {
+        if (isAuto === undefined) isAuto = true;
         const text = data.hitokoto || '生活明朗，万物可爱。';
         const from = data.from ? '—— ' + data.from : '';
 
@@ -177,13 +178,19 @@ let CONFIG = {
             if (!res.ok) throw new Error('API 响应异常');
 
             const data = await res.json();
-            updateHitokoto(data);
+            updateHitokoto(data, isAuto);
 
         } catch (err) {
             console.warn('一言加载失败，使用备用句子', err);
+            iziToast.error({
+                position: 'topRight',
+                title: 'ERROR',
+                message: '一言加载失败，' + err.message,
+                timeout: 10000,
+            });
 
             const fallbackItem = fallbackHitokotoItems[Math.floor(Math.random() * fallbackHitokotoItems.length)];
-            updateHitokoto(fallbackItem);
+            updateHitokoto(fallbackItem, isAuto);
 
             // hitokotoEl.classList.remove('loading', 'hidden');
             // hitokotoText.textContent = '且听风吟，静待花开。';
@@ -214,7 +221,7 @@ let CONFIG = {
     hitokotoWrapper.addEventListener('click', function (e) {
         e.stopPropagation();
         resetAutoRefresh();
-        fetchHitokoto();
+        fetchHitokoto(false);
     });
 
     document.addEventListener('keydown', function (e) {
@@ -348,6 +355,12 @@ let CONFIG = {
             console.log('在线壁纸已加载');
         }).catch(function (err) {
             console.warn('在线壁纸加载失败，使用默认壁纸', err);
+            iziToast.error({
+                position: 'topRight',
+                title: 'ERROR',
+                message: '在线壁纸加载失败，' + err.message,
+                timeout: 10000,
+            });
             wallpaperBg.style.opacity = '1';
             wallpaperBg.style.backgroundImage = '';
         });
