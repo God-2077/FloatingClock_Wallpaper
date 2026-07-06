@@ -1,18 +1,18 @@
-const CONFIG = {
+let CONFIG = {
     wallpaper: {
-        mode: 'carousel',          // 'default' | 'online' | 'carousel'
-        onlineUrl: '',            // mode='online' 时填写
-        carouselUrls: ['https://t.alcy.cc/ycy'],         // mode='carousel' 时填写
-        carouselInterval: 60 * 1000,  // 轮播间隔(ms)
+        mode: 'carousel',
+        onlineUrl: '',
+        carouselUrls: ['https://t.alcy.cc/ycy'],
+        carouselInterval: 60 * 1000,
     },
     hitokoto: {
         autoRefresh: {
             enabled: true,
-            autoRefreshInterval: 1000 * 60,  // 自动刷新间隔(ms)
+            autoRefreshInterval: 1000 * 60,
         }
     },
-    ui:{
-        scale: 0.9,  // UI 缩放比例
+    ui: {
+        scale: 0.9,
     }
 };
 
@@ -28,8 +28,7 @@ const CONFIG = {
     const hitokotoText = document.getElementById('hitokotoText');
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
-
-    const AUTO_REFRESH_INTERVAL = CONFIG.hitokoto.autoRefresh.enabled ? CONFIG.hitokoto.autoRefresh.autoRefreshInterval : 0;
+    const wallpaperBg = document.querySelector('.wallpaper-bg');
 
     const VanillaTiltConfig = {
         max: 2,
@@ -38,13 +37,20 @@ const CONFIG = {
         glare: true,
         'max-glare': 0.15,
         perspective: 1000,
-    }
+    };
 
     VanillaTilt.init(clockEl, VanillaTiltConfig);
     VanillaTilt.init(hitokotoEl, VanillaTiltConfig);
 
-    // UI 缩放
-    UIEl.style.transform = `scale(${CONFIG.ui.scale})`;
+    let carouselRunning = false;
+    let carouselTimer = null;
+    let currentBg = wallpaperBg;
+    let autoRefreshTimer = null;
+    let initialized = false;
+
+    function applyUIScale() {
+        UIEl.style.transform = `scale(${CONFIG.ui.scale})`;
+    }
 
     function updateClock() {
         const now = new Date();
@@ -60,7 +66,8 @@ const CONFIG = {
     updateClock();
     setInterval(updateClock, 1000);
 
-    async function fetchHitokoto(isAuto = false) {
+    async function fetchHitokoto(isAuto) {
+        if (isAuto === undefined) isAuto = false;
         try {
             if (!hitokotoEl.classList.contains('hidden') && !isAuto) {
                 hitokotoEl.classList.add('loading');
@@ -81,17 +88,15 @@ const CONFIG = {
             ];
 
             const searchParams = new URLSearchParams(params);
-
             const baseApi = new URL('https://v1.hitokoto.cn/');
             baseApi.search = searchParams.toString();
-
             const res = await fetch(baseApi.toString());
 
             if (!res.ok) throw new Error('API 响应异常');
 
             const data = await res.json();
             const text = data.hitokoto || '生活明朗，万物可爱。';
-            const from = data.from ? `—— ${data.from}` : '';
+            const from = data.from ? '—— ' + data.from : '';
 
             hitokotoEl.classList.remove('loading', 'hidden');
             hitokotoText.textContent = text;
@@ -103,8 +108,7 @@ const CONFIG = {
                 hitokotoEl.classList.remove(enterClass);
             }, { once: true });
 
-            console.log(`一言: "${text}"，${from}`);
-
+            console.log('一言: "' + text + '"，' + from);
         } catch (err) {
             console.warn('一言加载失败，使用备用句子', err);
             hitokotoEl.classList.remove('loading', 'hidden');
@@ -113,23 +117,25 @@ const CONFIG = {
         }
     }
 
-    fetchHitokoto();
-
-    let autoTimer = null;
-
-    function startAutoRefresh() {
-        if (AUTO_REFRESH_INTERVAL <= 0) return;
-        autoTimer = setInterval(() => fetchHitokoto(true), AUTO_REFRESH_INTERVAL);
-    }
-
-    function resetAutoRefresh() {
-        if (autoTimer !== null) {
-            clearInterval(autoTimer);
-            startAutoRefresh();
+    function stopAutoRefresh() {
+        if (autoRefreshTimer !== null) {
+            clearInterval(autoRefreshTimer);
+            autoRefreshTimer = null;
         }
     }
 
-    startAutoRefresh();
+    function startAutoRefresh() {
+        stopAutoRefresh();
+        if (!CONFIG.hitokoto.autoRefresh.enabled) return;
+        var interval = CONFIG.hitokoto.autoRefresh.autoRefreshInterval;
+        if (interval <= 0) return;
+        autoRefreshTimer = setInterval(function () { fetchHitokoto(true); }, interval);
+    }
+
+    function resetAutoRefresh() {
+        stopAutoRefresh();
+        startAutoRefresh();
+    }
 
     hitokotoWrapper.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -146,18 +152,18 @@ const CONFIG = {
         }
     });
 
-    let decorVisible = true;
+    var decorVisible = true;
     clockEl.addEventListener('dblclick', function (e) {
         e.stopPropagation();
-        const brushes = document.querySelectorAll('.art-brush, .clock-underline');
+        var brushes = document.querySelectorAll('.art-brush, .clock-underline');
         decorVisible = !decorVisible;
-        brushes.forEach(el => {
+        brushes.forEach(function (el) {
             el.style.transition = 'opacity 0.6s ease';
             el.style.opacity = decorVisible ? '' : '0';
         });
         clockEl.style.transition = 'transform 0.15s';
         clockEl.style.transform = 'scale(0.97)';
-        setTimeout(() => {
+        setTimeout(function () {
             clockEl.style.transform = 'scale(1)';
         }, 150);
     });
@@ -167,22 +173,20 @@ const CONFIG = {
     console.log('📌 按 R 键 → 刷新一言');
     console.log('📌 双击时钟 → 切换装饰显示');
 
-    const wallpaperBg = document.querySelector('.wallpaper-bg');
-
     function preloadImage(url) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error('Failed to load image'));
+        return new Promise(function (resolve, reject) {
+            var img = new Image();
+            img.onload = function () { resolve(img); };
+            img.onerror = function () { reject(new Error('Failed to load image')); };
             img.src = url;
         });
     }
 
     function crossfade(fromEl, imgUrl) {
-        return new Promise(resolve => {
-            const nextBg = document.createElement('div');
+        return new Promise(function (resolve) {
+            var nextBg = document.createElement('div');
             nextBg.className = 'wallpaper-bg';
-            nextBg.style.backgroundImage = `url('${imgUrl}')`;
+            nextBg.style.backgroundImage = "url('" + imgUrl + "')";
             nextBg.style.opacity = '0';
             nextBg.style.zIndex = '1';
             nextBg.style.transition = 'none';
@@ -196,7 +200,7 @@ const CONFIG = {
             nextBg.style.opacity = '1';
             fromEl.style.opacity = '0';
 
-            let resolved = false;
+            var resolved = false;
             function done() {
                 if (resolved) return;
                 resolved = true;
@@ -212,26 +216,51 @@ const CONFIG = {
         });
     }
 
-    function initWallpaper() {
-        const cfg = CONFIG.wallpaper;
+    function resetWallpaperDOM() {
+        var allBgs = document.querySelectorAll('.wallpaper > .wallpaper-bg');
+        for (var i = allBgs.length - 1; i > 0; i--) {
+            allBgs[i].remove();
+        }
+        currentBg = wallpaperBg;
+        wallpaperBg.style.opacity = '1';
+        wallpaperBg.style.backgroundImage = '';
+        wallpaperBg.style.zIndex = '';
+        wallpaperBg.style.transition = '';
+    }
 
-        if (cfg.mode === 'default') return;
+    function stopWallpaper() {
+        carouselRunning = false;
+        if (carouselTimer !== null) {
+            clearTimeout(carouselTimer);
+            carouselTimer = null;
+        }
+    }
 
+    function startWallpaper() {
+        stopWallpaper();
+        var cfg = CONFIG.wallpaper;
+
+        if (cfg.mode === 'default') {
+            resetWallpaperDOM();
+            return;
+        }
+
+        resetWallpaperDOM();
         wallpaperBg.style.backgroundImage = 'none';
         wallpaperBg.style.opacity = '0';
 
         if (cfg.mode === 'online') {
-            initOnline(cfg);
+            startOnline(cfg);
             return;
         }
 
         if (cfg.mode === 'carousel') {
-            initCarousel(cfg);
+            startCarousel(cfg);
             return;
         }
     }
 
-    async function initOnline(cfg) {
+    function startOnline(cfg) {
         if (!cfg.onlineUrl) {
             console.warn('onlineUrl 为空，使用默认壁纸');
             wallpaperBg.style.opacity = '1';
@@ -239,20 +268,19 @@ const CONFIG = {
             return;
         }
 
-        try {
-            const img = await preloadImage(cfg.onlineUrl);
-            wallpaperBg.style.backgroundImage = `url('${img.src}')`;
+        preloadImage(cfg.onlineUrl).then(function (img) {
+            wallpaperBg.style.backgroundImage = "url('" + img.src + "')";
             wallpaperBg.style.opacity = '1';
             console.log('在线壁纸已加载');
-        } catch (err) {
+        }).catch(function (err) {
             console.warn('在线壁纸加载失败，使用默认壁纸', err);
             wallpaperBg.style.opacity = '1';
             wallpaperBg.style.backgroundImage = '';
-        }
+        });
     }
 
-    async function initCarousel(cfg) {
-        const urls = cfg.carouselUrls;
+    function startCarousel(cfg) {
+        var urls = cfg.carouselUrls;
         if (!urls || urls.length === 0) {
             console.warn('carouselUrls 为空，使用默认壁纸');
             wallpaperBg.style.opacity = '1';
@@ -260,35 +288,125 @@ const CONFIG = {
             return;
         }
 
-        const interval = cfg.carouselInterval || 30000;
-        let currentBg = wallpaperBg;
-        let index = 0;
-        let firstLoad = true;
+        var interval = cfg.carouselInterval || 30000;
+        currentBg = wallpaperBg;
+        var index = 0;
+        var firstLoad = true;
+        carouselRunning = true;
 
-        while (true) {
-            try {
-                const delim = urls[index].includes('?') ? '&' : '?';
-                const cacheBustUrl = urls[index] + delim + '_t=' + Date.now(); // 绕过图片缓存
-                const img = await preloadImage(cacheBustUrl);
+        function nextSlide() {
+            if (!carouselRunning) return;
+
+            var delim = urls[index].indexOf('?') !== -1 ? '&' : '?';
+            var cacheBustUrl = urls[index] + delim + '_t=' + Date.now();
+
+            preloadImage(cacheBustUrl).then(function (img) {
+                var handleResult = function () {
+                    index = (index + 1) % urls.length;
+                    if (carouselRunning) {
+                        carouselTimer = setTimeout(nextSlide, interval);
+                    }
+                };
 
                 if (firstLoad) {
-                    currentBg.style.backgroundImage = `url('${img.src}')`;
+                    currentBg.style.backgroundImage = "url('" + img.src + "')";
                     currentBg.style.opacity = '1';
                     firstLoad = false;
+                    handleResult();
                 } else {
-                    currentBg = await crossfade(currentBg, img.src);
+                    crossfade(currentBg, img.src).then(function (newBg) {
+                        currentBg = newBg;
+                        handleResult();
+                    });
                 }
 
-                console.log(`轮播 [${index + 1}/${urls.length}]`);
-            } catch (err) {
-                console.warn(`轮播: 图片加载失败 [${index}] ${urls[index]}`, err);
-            }
-
-            index = (index + 1) % urls.length;
-            await new Promise(r => setTimeout(r, interval));
+                console.log('轮播 [' + (index + 1) + '/' + urls.length + ']');
+            }).catch(function (err) {
+                console.warn('轮播: 图片加载失败 [' + index + '] ' + urls[index], err);
+                index = (index + 1) % urls.length;
+                if (carouselRunning) {
+                    carouselTimer = setTimeout(nextSlide, interval);
+                }
+            });
         }
+
+        nextSlide();
     }
 
-    initWallpaper();
+    function initAll() {
+        if (initialized) return;
+        initialized = true;
+        applyUIScale();
+        startWallpaper();
+        fetchHitokoto();
+        startAutoRefresh();
+    }
+
+    // ====== wallpaperPropertyListener ======
+    window.wallpaperPropertyListener = {
+        applyUserProperties: function (properties) {
+            var needsWallpaperRestart = false;
+            var needsHitokotoRestart = false;
+            var needsUIScaleUpdate = false;
+
+            if (properties.wallpapermode) {
+                CONFIG.wallpaper.mode = properties.wallpapermode.value;
+                needsWallpaperRestart = true;
+            }
+
+            if (properties.onlineurl) {
+                CONFIG.wallpaper.onlineUrl = properties.onlineurl.value;
+                if (CONFIG.wallpaper.mode === 'online') {
+                    needsWallpaperRestart = true;
+                }
+            }
+
+            if (properties.carouselurls) {
+                var raw = properties.carouselurls.value.trim();
+                CONFIG.wallpaper.carouselUrls = raw
+                    ? raw.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+                    : [];
+                if (CONFIG.wallpaper.mode === 'carousel') {
+                    needsWallpaperRestart = true;
+                }
+            }
+
+            if (properties.carouselinterval) {
+                var val = parseInt(properties.carouselinterval.value, 10);
+                CONFIG.wallpaper.carouselInterval = (isNaN(val) || val <= 0) ? 60000 : val;
+                if (CONFIG.wallpaper.mode === 'carousel') {
+                    needsWallpaperRestart = true;
+                }
+            }
+
+            if (properties.hitokotoautorefresh) {
+                CONFIG.hitokoto.autoRefresh.enabled = properties.hitokotoautorefresh.value;
+                needsHitokotoRestart = true;
+            }
+
+            if (properties.hitokotorefreshinterval) {
+                var val2 = parseInt(properties.hitokotorefreshinterval.value, 10);
+                CONFIG.hitokoto.autoRefresh.autoRefreshInterval = (isNaN(val2) || val2 <= 0) ? 60000 : val2;
+                if (CONFIG.hitokoto.autoRefresh.enabled) {
+                    needsHitokotoRestart = true;
+                }
+            }
+
+            if (properties.uiscale) {
+                CONFIG.ui.scale = properties.uiscale.value;
+                needsUIScaleUpdate = true;
+            }
+
+            if (!initialized) {
+                initAll();
+            } else {
+                if (needsWallpaperRestart) startWallpaper();
+                if (needsHitokotoRestart) resetAutoRefresh();
+                if (needsUIScaleUpdate) applyUIScale();
+            }
+        }
+    };
+
+    setTimeout(function () { initAll(); }, 1000);
 
 })();
