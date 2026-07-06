@@ -1,6 +1,6 @@
 {
 	"contentrating" : "Everyone",
-	"description" : "web 二次元壁纸（随机-可自定义）\n\nGithub: https://github.com/God-2077/FloatingClock_Wallpaper",
+	"description" : "二次元随机壁纸（随机-可自定义）\n\nGithub: https://github.com/God-2077/FloatingClock_Wallpaper",
 	"file" : "index.html",
 	"general" : 
 	{
@@ -38,83 +38,94 @@
 				"type" : "textinput",
 				"value" : "60000"
 			},
-            "hitokototypea": {
-                "index": 9,
-                "order": 109,
-                "text": "动画",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypeb": {
-                "index": 10,
-                "order": 110,
-                "text": "漫画",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypec": {
-                "index": 11,
-                "order": 111,
-                "text": "游戏",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototyped": {
-                "index": 12,
-                "order": 112,
-                "text": "文学",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypee": {
-                "index": 13,
-                "order": 113,
-                "text": "原创",
-                "type": "bool",
-                "value": false
-            },
-            "hitokototypef": {
-                "index": 14,
-                "order": 114,
-                "text": "来自网络",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypeh": {
-                "index": 15,
-                "order": 115,
-                "text": "影视",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypei": {
-                "index": 16,
-                "order": 116,
-                "text": "诗词",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypej": {
-                "index": 17,
-                "order": 117,
-                "text": "网易云",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypek": {
-                "index": 18,
-                "order": 118,
-                "text": "哲学",
-                "type": "bool",
-                "value": true
-            },
-            "hitokototypel": {
-                "index": 19,
-                "order": 119,
-                "text": "抖机灵",
-                "type": "bool",
-                "value": true
-            },
+			"hitokototypea" : 
+			{
+				"index" : 9,
+				"order" : 109,
+				"text" : "动画",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypeb" : 
+			{
+				"index" : 10,
+				"order" : 110,
+				"text" : "漫画",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypec" : 
+			{
+				"index" : 11,
+				"order" : 111,
+				"text" : "游戏",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototyped" : 
+			{
+				"index" : 12,
+				"order" : 112,
+				"text" : "文学",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypee" : 
+			{
+				"index" : 13,
+				"order" : 113,
+				"text" : "原创",
+				"type" : "bool",
+				"value" : false
+			},
+			"hitokototypef" : 
+			{
+				"index" : 14,
+				"order" : 114,
+				"text" : "来自网络",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypeh" : 
+			{
+				"index" : 15,
+				"order" : 115,
+				"text" : "影视",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypei" : 
+			{
+				"index" : 16,
+				"order" : 116,
+				"text" : "诗词",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypej" : 
+			{
+				"index" : 17,
+				"order" : 117,
+				"text" : "网易云",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypek" : 
+			{
+				"index" : 18,
+				"order" : 118,
+				"text" : "哲学",
+				"type" : "bool",
+				"value" : true
+			},
+			"hitokototypel" : 
+			{
+				"index" : 19,
+				"order" : 119,
+				"text" : "抖机灵",
+				"type" : "bool",
+				"value" : true
+			},
 			"hitokototypetitle" : 
 			{
 				"index" : 8,
@@ -192,7 +203,7 @@
 	"tags" : [ "Anime" ],
 	"title" : "二次元随机壁纸（随机-可自定义）",
 	"type" : "web",
-	"version" : 2,
+	"version" : 3,
 	"visibility" : "public",
 	"workshopid" : "3758991075",
 	"workshopurl" : "steam://url/CommunityFilePage/3758991075"
