@@ -42,6 +42,49 @@ let CONFIG = {
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
     const wallpaperBg = document.querySelector('.wallpaper-bg');
+    // 一言加载失败，使用备用句子
+    const fallbackHitokotoItems = [
+        {
+            "hitokoto": "牛高达可不只是好看而已!",
+            "type": "a",
+            "from": "机动战士高达",
+        },
+        {
+            "hitokoto": "温柔正确的人总是难以生存，因为这世界既不温柔，也不正确。",
+            "type": "b",
+            "from": "我的青春恋爱物语果然有问题",
+        },
+        {
+            "hitokoto": "人，百年一世；龙，百年一岁。君生吾已老，君未变，而吾已老。",
+            "type": "b",
+            "from": "妖怪名单",
+        },
+        {
+            "hitokoto": "好了 接下来就让你们见识一下程序员的本事",
+            "type": "a",
+            "from": "骑士与魔法",
+        },
+        {
+            "hitokoto": "幻术世界有什么不好，现实太残酷，只会让这空洞越来越大。",
+            "type": "b",
+            "from": "火影忍者",
+        },
+        {
+            "hitokoto": "我命令你，喜欢我！",
+            "type": "b",
+            "from": "加油大魔王",
+        },
+        {
+            "hitokoto": "你愿意陪我走到地狱的底端吗？",
+            "type": "a",
+            "from": "魔法禁书目录",
+        },
+        {
+            "hitokoto": "一直保持微笑是有诀窍的，那就是，在想哭的时候放声大哭。",
+            "type": "a",
+            "from": "天使领域",
+        },
+    ];
 
     VanillaTilt.init(clockEl, {
         max: 2,
@@ -83,6 +126,23 @@ let CONFIG = {
     updateClock();
     setInterval(updateClock, 1000);
 
+    function updateHitokoto(data) {
+        const text = data.hitokoto || '生活明朗，万物可爱。';
+        const from = data.from ? '—— ' + data.from : '';
+
+        hitokotoEl.classList.remove('loading', 'hidden');
+        hitokotoText.textContent = text;
+        hitokotoFrom.textContent = from;
+
+        const enterClass = isAuto ? 'entering-auto' : 'entering';
+        hitokotoEl.classList.add(enterClass);
+        hitokotoEl.addEventListener('animationend', function onEnterEnd() {
+            hitokotoEl.classList.remove(enterClass);
+        }, { once: true });
+
+        console.log('一言: "' + text + '"，' + from);
+    }
+
     async function fetchHitokoto(isAuto) {
         if (isAuto === undefined) isAuto = false;
         try {
@@ -117,25 +177,17 @@ let CONFIG = {
             if (!res.ok) throw new Error('API 响应异常');
 
             const data = await res.json();
-            const text = data.hitokoto || '生活明朗，万物可爱。';
-            const from = data.from ? '—— ' + data.from : '';
+            updateHitokoto(data);
 
-            hitokotoEl.classList.remove('loading', 'hidden');
-            hitokotoText.textContent = text;
-            hitokotoFrom.textContent = from;
-
-            const enterClass = isAuto ? 'entering-auto' : 'entering';
-            hitokotoEl.classList.add(enterClass);
-            hitokotoEl.addEventListener('animationend', function onEnterEnd() {
-                hitokotoEl.classList.remove(enterClass);
-            }, { once: true });
-
-            console.log('一言: "' + text + '"，' + from);
         } catch (err) {
             console.warn('一言加载失败，使用备用句子', err);
-            hitokotoEl.classList.remove('loading', 'hidden');
-            hitokotoText.textContent = '且听风吟，静待花开。';
-            hitokotoFrom.textContent = '';
+
+            const fallbackItem = fallbackHitokotoItems[Math.floor(Math.random() * fallbackHitokotoItems.length)];
+            updateHitokoto(fallbackItem);
+
+            // hitokotoEl.classList.remove('loading', 'hidden');
+            // hitokotoText.textContent = '且听风吟，静待花开。';
+            // hitokotoFrom.textContent = '';
         }
     }
 
