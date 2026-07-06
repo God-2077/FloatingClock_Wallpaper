@@ -107,6 +107,7 @@ let CONFIG = {
     let carouselTimer = null;
     let currentBg = wallpaperBg;
     let autoRefreshTimer = null;
+    let preloadedHitokoto = null;  // 预加载的一言数据
     let initialized = false;
 
     function applyUIScale() {
@@ -145,6 +146,37 @@ let CONFIG = {
         console.log('一言: "' + text + '"，' + from);
     }
 
+    // 从 API 获取一言数据，返回 Promise<data>
+    async function fetchHitokotoData() {
+        var types = CONFIG.hitokoto.types;
+        var typeKeys = Object.keys(types);
+        var enabledTypes = [];
+        for (var i = 0; i < typeKeys.length; i++) {
+            if (types[typeKeys[i]]) {
+                enabledTypes.push(typeKeys[i]);
+            }
+        }
+        if (enabledTypes.length === 0) {
+            enabledTypes = typeKeys;
+            console.warn('一言: 未选择任何句子类型，使用全部类型');
+        }
+
+        var params = [];
+        for (var j = 0; j < enabledTypes.length; j++) {
+            params.push(['c', enabledTypes[j]]);
+        }
+        params.push(['encode', 'json']);
+
+        const searchParams = new URLSearchParams(params);
+        const baseApi = new URL('https://v1.hitokoto.cn/');
+        baseApi.search = searchParams.toString();
+        const res = await fetch(baseApi.toString());
+
+        if (!res.ok) throw new Error('API 响应异常');
+
+        return await res.json();
+    }
+
     async function fetchHitokoto(isAuto) {
         if (isAuto === undefined) isAuto = false;
         try {
@@ -152,33 +184,7 @@ let CONFIG = {
                 hitokotoEl.classList.add('loading');
             }
 
-            var types = CONFIG.hitokoto.types;
-            var typeKeys = Object.keys(types);
-            var enabledTypes = [];
-            for (var i = 0; i < typeKeys.length; i++) {
-                if (types[typeKeys[i]]) {
-                    enabledTypes.push(typeKeys[i]);
-                }
-            }
-            if (enabledTypes.length === 0) {
-                enabledTypes = typeKeys;
-                console.warn('一言: 未选择任何句子类型，使用全部类型');
-            }
-
-            var params = [];
-            for (var j = 0; j < enabledTypes.length; j++) {
-                params.push(['c', enabledTypes[j]]);
-            }
-            params.push(['encode', 'json']);
-
-            const searchParams = new URLSearchParams(params);
-            const baseApi = new URL('https://v1.hitokoto.cn/');
-            baseApi.search = searchParams.toString();
-            const res = await fetch(baseApi.toString());
-
-            if (!res.ok) throw new Error('API 响应异常');
-
-            const data = await res.json();
+            const data = await fetchHitokotoData();
             updateHitokoto(data, isAuto);
 
         } catch (err) {
@@ -192,18 +198,44 @@ let CONFIG = {
 
             const fallbackItem = fallbackHitokotoItems[Math.floor(Math.random() * fallbackHitokotoItems.length)];
             updateHitokoto(fallbackItem, isAuto);
-
-            // hitokotoEl.classList.remove('loading', 'hidden');
-            // hitokotoText.textContent = '且听风吟，静待花开。';
-            // hitokotoFrom.textContent = '';
         }
+    }
+
+    // 预加载下一句一言（不显示，仅缓存）
+    async function preloadNextHitokoto() {
+        try {
+            preloadedHitokoto = await fetchHitokotoData();
+            console.log('一言: 预加载完成');
+        } catch (err) {
+            console.warn('一言预加载失败，使用备用句子', err);
+            const fallbackItem = fallbackHitokotoItems[Math.floor(Math.random() * fallbackHitokotoItems.length)];
+            preloadedHitokoto = fallbackItem;
+        }
+    }
+
+    // 计时器到时间：切换到预加载的句子
+    function onHitokotoTick() {
+        if (!CONFIG.hitokoto.autoRefresh.enabled) return;
+
+        // 切换到预加载的句子
+        if (preloadedHitokoto) {
+            updateHitokoto(preloadedHitokoto, true);
+            preloadedHitokoto = null;
+        }
+
+        // 预加载下一句
+        preloadNextHitokoto();
+
+        // 重新设置计时器
+        autoRefreshTimer = setTimeout(onHitokotoTick, CONFIG.hitokoto.autoRefresh.autoRefreshInterval);
     }
 
     function stopAutoRefresh() {
         if (autoRefreshTimer !== null) {
-            clearInterval(autoRefreshTimer);
+            clearTimeout(autoRefreshTimer);
             autoRefreshTimer = null;
         }
+        preloadedHitokoto = null;
     }
 
     function startAutoRefresh() {
@@ -211,7 +243,10 @@ let CONFIG = {
         if (!CONFIG.hitokoto.autoRefresh.enabled) return;
         var interval = CONFIG.hitokoto.autoRefresh.autoRefreshInterval;
         if (interval <= 0) return;
-        autoRefreshTimer = setInterval(function () { fetchHitokoto(true); }, interval);
+
+        // 计时器开始 → 预加载下一句 → 计时器到时间 → 切换
+        preloadNextHitokoto();
+        autoRefreshTimer = setTimeout(onHitokotoTick, interval);
     }
 
     function resetAutoRefresh() {
@@ -381,48 +416,88 @@ let CONFIG = {
 
         var interval = cfg.carouselInterval || 30000;
         currentBg = wallpaperBg;
-        var index = 0;
-        var firstLoad = true;
         carouselRunning = true;
+        var preloadedImg = null;   // 预加载好的图片
+        var nextIndex = 0;         // 下一个要预加载的图片索引
 
-        function nextSlide() {
+        function getCacheBustUrl(url) {
+            var delim = url.indexOf('?') !== -1 ? '&' : '?';
+            return url + delim + '_t=' + Date.now();
+        }
+
+        // 切换到预加载好的图片（crossfade）
+        function switchToPreloaded() {
             if (!carouselRunning) return;
+            if (!preloadedImg) return;
 
-            var delim = urls[index].indexOf('?') !== -1 ? '&' : '?';
-            var cacheBustUrl = urls[index] + delim + '_t=' + Date.now();
+            crossfade(currentBg, preloadedImg.src).then(function (newBg) {
+                currentBg = newBg;
+            });
+            preloadedImg = null;
+        }
+
+        // 预加载下一张图片
+        function preloadNextImage() {
+            if (!carouselRunning) return;
+            var url = urls[nextIndex];
+            var cacheBustUrl = getCacheBustUrl(url);
 
             preloadImage(cacheBustUrl).then(function (img) {
-                var handleResult = function () {
-                    index = (index + 1) % urls.length;
-                    if (carouselRunning) {
-                        carouselTimer = setTimeout(nextSlide, interval);
-                    }
-                };
-
-                if (firstLoad) {
-                    currentBg.style.backgroundImage = "url('" + img.src + "')";
-                    void currentBg.offsetHeight;
-                    currentBg.style.opacity = '1';
-                    firstLoad = false;
-                    handleResult();
-                } else {
-                    crossfade(currentBg, img.src).then(function (newBg) {
-                        currentBg = newBg;
-                        handleResult();
-                    });
-                }
-
-                console.log('轮播 [' + (index + 1) + '/' + urls.length + ']');
+                preloadedImg = img;
+                console.log('轮播: 预加载完成 [' + (nextIndex + 1) + '/' + urls.length + ']');
+                nextIndex = (nextIndex + 1) % urls.length;
             }).catch(function (err) {
-                console.warn('轮播: 图片加载失败 [' + index + '] ' + urls[index], err);
-                index = (index + 1) % urls.length;
-                if (carouselRunning) {
-                    carouselTimer = setTimeout(nextSlide, interval);
-                }
+                console.warn('轮播: 预加载失败 [' + nextIndex + '] ' + url, err);
+                nextIndex = (nextIndex + 1) % urls.length;
+                // 重试预加载下一张
+                preloadNextImage();
             });
         }
 
-        nextSlide();
+        // 计时器到时间：切换到预加载的图片，预加载下一张，重新计时
+        function onCarouselTick() {
+            if (!carouselRunning) return;
+
+            // 计时器到时间 → 切换到预加载的图片
+            switchToPreloaded();
+
+            // 预加载下一张图片
+            preloadNextImage();
+
+            // 重新设置计时器
+            carouselTimer = setTimeout(onCarouselTick, interval);
+        }
+
+        // ===== 第一次请求 =====
+        var firstUrl = urls[0];
+        var firstCacheBustUrl = getCacheBustUrl(firstUrl);
+
+        preloadImage(firstCacheBustUrl).then(function (img) {
+            if (!carouselRunning) return;
+
+            // 显示第一张图片
+            currentBg.style.backgroundImage = "url('" + img.src + "')";
+            void currentBg.offsetHeight;
+            currentBg.style.opacity = '1';
+            console.log('轮播 [' + 1 + '/' + urls.length + ']');
+
+            // 下一张从索引1开始预加载
+            nextIndex = 1 % urls.length;
+
+            // 计时器开始 → 预加载下一张
+            preloadNextImage();
+            carouselTimer = setTimeout(onCarouselTick, interval);
+        }).catch(function (err) {
+            console.warn('轮播: 第一张图片加载失败', err);
+            iziToast.error({
+                position: 'topRight',
+                title: 'ERROR',
+                message: '轮播首张图片加载失败，' + err.message,
+                timeout: 10000,
+            });
+            wallpaperBg.style.opacity = '1';
+            wallpaperBg.style.backgroundImage = '';
+        });
     }
 
     function initAll() {
