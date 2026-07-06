@@ -1,0 +1,29 @@
+{
+	"contentrating" : "Everyone",
+	"description" : "web 二次元壁纸（随机-可自定义）\n\nGithub: https://github.com/God-2077/FloatingClock_Wallpaper",
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0 1 1"
+			}
+		}
+	},
+	"preview" : "img/preview.jpg",
+	"ratingsex" : "none",
+	"ratingviolence" : "none",
+	"snapshotformat" : -1,
+	"snapshotoverlay" : "",
+	"tags" : [ "Anime" ],
+	"title" : "二次元随机壁纸（随机-可自定义）",
+	"type" : "web",
+	"version" : 1,
+	"workshopid" : "3758991075",
+	"workshopurl" : "steam://url/CommunityFilePage/3758991075"
+}
