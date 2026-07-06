@@ -1,0 +1,102 @@
+{
+	"file" : "index.html",
+	"general" : 
+	{
+		"properties" : 
+		{
+			"mycheckbox" : 
+			{
+				"index" : 2,
+				"order" : 102,
+				"text" : "Checkbox",
+				"type" : "bool",
+				"value" : false
+			},
+			"mycolor" : 
+			{
+				"index" : 0,
+				"order" : 100,
+				"text" : "Color",
+				"type" : "color",
+				"value" : "1 0 0"
+			},
+			"mycombo" : 
+			{
+				"index" : 3,
+				"options" : 
+				[
+					{
+						"label" : "circle",
+						"value" : "circle"
+					},
+					{
+						"label" : "square",
+						"value" : "square"
+					}
+				],
+				"order" : 103,
+				"text" : "mycombo",
+				"type" : "combo",
+				"value" : "circle"
+			},
+			"mydirectory" : 
+			{
+				"index" : 6,
+				"order" : 106,
+				"text" : "mydirectory",
+				"type" : "file",
+				"value" : ""
+			},
+			"myfile" : 
+			{
+				"index" : 5,
+				"order" : 105,
+				"text" : "myfile",
+				"type" : "file",
+				"value" : ""
+			},
+			"myslider" : 
+			{
+				"fraction" : false,
+				"index" : 1,
+				"max" : 200,
+				"min" : 10,
+				"order" : 101,
+				"text" : "Slider（10–200）",
+				"type" : "slider",
+				"value" : 10
+			},
+			"mytext" : 
+			{
+				"index" : 4,
+				"order" : 104,
+				"text" : "mytext",
+				"type" : "textinput",
+				"value" : ""
+			},
+			"myuiscale" : 
+			{
+				"fraction" : true,
+				"index" : 7,
+				"max" : 2,
+				"min" : 0.5,
+				"order" : 107,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "myuiscale",
+				"type" : "slider",
+				"value" : 1
+			},
+			"schemecolor" : 
+			{
+				"order" : 0,
+				"text" : "ui_browse_properties_scheme_color",
+				"type" : "color",
+				"value" : "0 0 0"
+			}
+		}
+	},
+	"title" : "web 壁纸",
+	"type" : "web",
+	"version" : 0
+}

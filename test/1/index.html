@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Properties 示范壁纸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            transition: background 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ========== 信息面板 ========== */
+        .panel {
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(1.2vw);
+            -webkit-backdrop-filter: blur(1.2vw);
+            border-radius: 2vw;
+            padding: 4vw 5.5vw;
+            text-align: center;
+            border: 0.1vw solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 2vw 6vw rgba(0, 0, 0, 0.5);
+            transition: border-color 0.5s, box-shadow 0.5s, transform 0.3s;
+            min-width: 42vw;
+            max-width: 90vw;
+        }
+
+        .panel h1 {
+            font-size: clamp(1.8rem, 3.2vw, 4.2rem);
+            font-weight: 300;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.6vw;
+            transition: color 0.4s;
+        }
+
+        .panel .subtitle {
+            font-size: clamp(0.8rem, 1.2vw, 1.8rem);
+            opacity: 0.65;
+            letter-spacing: 0.12em;
+            transition: color 0.4s;
+            margin-bottom: 1vw;
+        }
+
+        .divider {
+            width: 60%;
+            height: 0.08vw;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 2vw auto;
+            border-radius: 1px;
+        }
+
+        /* ---------- 实时属性展示：4列2行 ---------- */
+        .live-values {
+            margin-top: 2.4vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 1.8vw 2vw;
+            font-size: clamp(0.65rem, 1vw, 1.3rem);
+            opacity: 0.8;
+            transition: color 0.4s;
+        }
+
+        .live-values .label {
+            font-size: 0.75em;
+            opacity: 0.6;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.3vw;
+        }
+
+        .live-values .val {
+            font-weight: 600;
+            font-size: 1.3em;
+            opacity: 1;
+            word-break: break-all;
+        }
+
+        /* ---------- 角落图片预览 ---------- */
+        .file-preview {
+            position: fixed;
+            bottom: 3vw;
+            right: 3vw;
+            z-index: 10;
+            width: clamp(80px, 11vw, 200px);
+            height: clamp(80px, 11vw, 200px);
+            border-radius: 1.5vw;
+            border: 0.2vw solid rgba(255, 255, 255, 0.2);
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.05);
+            transition: border-color 0.5s, opacity 0.4s, transform 0.3s;
+            pointer-events: none;
+        }
+
+        .file-preview.hidden {
+            opacity: 0;
+        }
+
+        /* ========== 超大屏微调 (4K+) ========== */
+        @media (min-width: 2560px) {
+            .panel {
+                padding: 3.5vw 5vw;
+                border-radius: 1.8vw;
+            }
+            .live-values {
+                gap: 1.5vw 1.8vw;
+            }
+        }
+
+        /* ========== 小屏适配 (≤1080p) ========== */
+        @media (max-width: 1100px) {
+            .panel {
+                padding: 5vw 6vw;
+                border-radius: 2.5vw;
+                min-width: 65vw;
+            }
+            .live-values {
+                grid-template-columns: 1fr 1fr;
+                gap: 2.5vw 3vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <!-- 中央面板 -->
+    <div class="panel" id="panel">
+        <h1 id="titleText">Hello World</h1>
+        <p class="subtitle" id="subtitleText">User Properties Demo</p>
+        <div class="divider"></div>
+        <div class="live-values" id="liveValues">
+            <div>
+                <div class="label">🎨 Color</div>
+                <div class="val" id="vColor">rgb(160,200,255)</div>
+            </div>
+            <div>
+                <div class="label">✨ Particles</div>
+                <div class="val" id="vSlider">50</div>
+            </div>
+            <div>
+                <div class="label">🔍 UI Scale</div>
+                <div class="val" id="vUIScale">1.0×</div>
+            </div>
+            <div>
+                <div class="label">✅ Checkbox</div>
+                <div class="val" id="vCheck">false</div>
+            </div>
+            <div>
+                <div class="label">📋 Combo</div>
+                <div class="val" id="vCombo">circle</div>
+            </div>
+            <div>
+                <div class="label">📝 Text</div>
+                <div class="val" id="vText">Hello World</div>
+            </div>
+            <div>
+                <div class="label">📁 File</div>
+                <div class="val" id="vFile">—</div>
+            </div>
+            <div>
+                <div class="label">📂 Directory</div>
+                <div class="val" id="vDir">0 files</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件预览图 -->
+    <img class="file-preview hidden" id="filePreview" alt="File preview" />
+
+    <script>
+        // ============================================================
+        //   DOM 引用
+        // ============================================================
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const panel = document.getElementById('panel');
+        const titleText = document.getElementById('titleText');
+        const subtitleText = document.getElementById('subtitleText');
+        const liveValues = document.getElementById('liveValues');
+        const filePreview = document.getElementById('filePreview');
+
+        const vColor   = document.getElementById('vColor');
+        const vSlider  = document.getElementById('vSlider');
+        const vUIScale = document.getElementById('vUIScale');
+        const vCheck   = document.getElementById('vCheck');
+        const vCombo   = document.getElementById('vCombo');
+        const vText    = document.getElementById('vText');
+        const vFile    = document.getElementById('vFile');
+        const vDir     = document.getElementById('vDir');
+
+        // ============================================================
+        //   默认值
+        // ============================================================
+        let settings = {
+            accentColor:    { r: 160, g: 200, b: 255 },
+            particleCount:  50,
+            uiScale:        1.0,        // ★ 新增：UI缩放，范围 0.5 ~ 2.0
+            showLines:      false,
+            shape:          'circle',
+            title:          'Hello World',
+            customImage:    null,
+            dirFileCount:   0,
+        };
+
+        // ============================================================
+        //   粒子系统
+        // ============================================================
+        let particles = [];
+        let w, h;
+        let particleRadiusBase;
+
+        function resize() {
+            w = canvas.width  = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            const diagonal = Math.sqrt(w * w + h * h);
+            particleRadiusBase = diagonal * 0.0012;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function createParticles(count) {
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: (Math.random() - 0.5) * 1.2,
+                    radius: Math.random() * particleRadiusBase * 2.5 + particleRadiusBase * 0.8,
+                });
+            }
+        }
+        createParticles(settings.particleCount);
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, w, h);
+
+            const r = settings.accentColor.r;
+            const g = settings.accentColor.g;
+            const b = settings.accentColor.b;
+
+            if (settings.showLines) {
+                const diagonal = Math.sqrt(w * w + h * h);
+                const maxDist = diagonal * 0.06;
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < maxDist) {
+                            const alpha = (1 - dist / maxDist) * 0.3;
+                            ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+                            ctx.lineWidth = particleRadiusBase * 0.18;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            for (const p of particles) {
+                ctx.fillStyle = `rgba(${r},${g},${b},0.8)`;
+                ctx.beginPath();
+
+                switch (settings.shape) {
+                    case 'square':
+                        ctx.rect(p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
+                        break;
+                    case 'diamond':
+                        ctx.moveTo(p.x, p.y - p.radius);
+                        ctx.lineTo(p.x + p.radius, p.y);
+                        ctx.lineTo(p.x, p.y + p.radius);
+                        ctx.lineTo(p.x - p.radius, p.y);
+                        ctx.closePath();
+                        break;
+                    default: // circle
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        break;
+                }
+                ctx.fill();
+            }
+        }
+
+        function updateParticles() {
+            for (const p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < -p.radius * 2) p.x = w + p.radius * 2;
+                if (p.x > w + p.radius * 2) p.x = -p.radius * 2;
+                if (p.y < -p.radius * 2) p.y = h + p.radius * 2;
+                if (p.y > h + p.radius * 2) p.y = -p.radius * 2;
+            }
+        }
+
+        function animate() {
+            updateParticles();
+            drawParticles();
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // ============================================================
+        //   应用设置到 UI
+        // ============================================================
+        function applySettings() {
+            const { accentColor, title, customImage, uiScale } = settings;
+            const colorCSS = `rgb(${accentColor.r},${accentColor.g},${accentColor.b})`;
+
+            // 背景
+            document.body.style.background =
+                `radial-gradient(ellipse at center, rgba(${accentColor.r},${accentColor.g},${accentColor.b},0.15) 0%, #0d0d1a 70%)`;
+
+            // 面板边框 & 光晕
+            panel.style.borderColor = `rgba(${accentColor.r},${accentColor.g},${accentColor.b},0.35)`;
+            panel.style.boxShadow =
+                `0 2vw 6vw rgba(0,0,0,0.5), 0 0 8vw rgba(${accentColor.r},${accentColor.g},${accentColor.b},0.08)`;
+
+            // ★ UI 缩放 —— 使用 transform scale，从中心缩放 ★
+            panel.style.transform = `scale(${uiScale})`;
+            filePreview.style.transform = `scale(${uiScale})`;
+
+            // 文字颜色
+            titleText.style.color = colorCSS;
+            subtitleText.style.color = colorCSS;
+            liveValues.style.color = colorCSS;
+
+            // 标题
+            titleText.textContent = title;
+
+            // 文件预览
+            if (customImage) {
+                filePreview.src = 'file:///' + customImage;
+                filePreview.classList.remove('hidden');
+            } else {
+                filePreview.classList.add('hidden');
+            }
+
+            // 实时数值
+            vColor.textContent   = colorCSS;
+            vSlider.textContent  = settings.particleCount;
+            vUIScale.textContent = uiScale.toFixed(1) + '×';
+            vCheck.textContent   = settings.showLines;
+            vCombo.textContent   = settings.shape;
+            vText.textContent    = title;
+            vFile.textContent    = customImage ? '✓ 已选择' : '—';
+            vDir.textContent     = settings.dirFileCount + ' files';
+        }
+
+        // ============================================================
+        //   ★ wallpaperPropertyListener（全局对象） ★
+        // ============================================================
+        window.wallpaperPropertyListener = {
+
+            applyUserProperties: function (properties) {
+
+                // Color
+                if (properties.mycolor) {
+                    const parts = properties.mycolor.value.split(' ');
+                    settings.accentColor = {
+                        r: Math.ceil(parseFloat(parts[0]) * 255),
+                        g: Math.ceil(parseFloat(parts[1]) * 255),
+                        b: Math.ceil(parseFloat(parts[2]) * 255),
+                    };
+                }
+
+                // Slider —— 粒子数量
+                if (properties.myslider) {
+                    const val = Math.round(properties.myslider.value);
+                    settings.particleCount = val;
+                    createParticles(val);
+                }
+
+                // ★ Slider —— UI 缩放 ★
+                if (properties.myuiscale) {
+                    settings.uiScale = properties.myuiscale.value;
+                }
+
+                // Checkbox
+                if (properties.mycheckbox) {
+                    settings.showLines = properties.mycheckbox.value;
+                }
+
+                // Combo
+                if (properties.mycombo) {
+                    settings.shape = properties.mycombo.value;
+                }
+
+                // Text
+                if (properties.mytext) {
+                    settings.title = properties.mytext.value;
+                }
+
+                // File
+                if (properties.myfile) {
+                    settings.customImage = properties.myfile.value;
+                }
+
+                applySettings();
+            },
+
+            // Directory: 文件新增/变更
+            userDirectoryFilesAddedOrChanged: function (propertyName, changedFiles) {
+                if (propertyName === 'mydirectory') {
+                    settings.dirFileCount = changedFiles.length;
+                    applySettings();
+                }
+            },
+
+            // Directory: 文件移除
+            userDirectoryFilesRemoved: function (propertyName, removedFiles) {
+                if (propertyName === 'mydirectory') {
+                    settings.dirFileCount = Math.max(0, settings.dirFileCount - removedFiles.length);
+                    applySettings();
+                }
+            },
+        };
+
+        // ============================================================
+        //   初始渲染
+        // ============================================================
+        applySettings();
+        createParticles(settings.particleCount);
+
+        console.log('✅ User Properties 示范壁纸已就绪 (自适应 + UI缩放版)');
+        console.log('   需在编辑器中添加的属性 key：');
+        console.log('   mycolor | myslider | myuiscale | mycheckbox | mycombo | mytext | myfile | mydirectory');
+    </script>
+</body>
+</html>
