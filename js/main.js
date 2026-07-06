@@ -1,8 +1,13 @@
-const WALLPAPER_CONFIG = {
-    mode: 'carousel',          // 'default' | 'online' | 'carousel'
-    onlineUrl: '',            // mode='online' 时填写
-    carouselUrls: ['https://t.alcy.cc/ycy'],         // mode='carousel' 时填写
-    carouselInterval: 60 * 1000,  // 轮播间隔(ms)
+const CONFIG = {
+    wallpaper: {
+        mode: 'carousel',          // 'default' | 'online' | 'carousel'
+        onlineUrl: '',            // mode='online' 时填写
+        carouselUrls: ['https://t.alcy.cc/ycy'],         // mode='carousel' 时填写
+        carouselInterval: 60 * 1000,  // 轮播间隔(ms)
+    },
+    hitokoto: {
+        autoRefreshInterval: 1000 * 60,
+    }
 };
 
 (function () {
@@ -17,7 +22,7 @@ const WALLPAPER_CONFIG = {
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
 
-    const AUTO_REFRESH_INTERVAL = 1000 * 60;
+    const AUTO_REFRESH_INTERVAL = CONFIG.hitokoto.autoRefreshInterval;
 
     const VanillaTiltConfig = {
         max: 2,
@@ -198,7 +203,7 @@ const WALLPAPER_CONFIG = {
     }
 
     function initWallpaper() {
-        const cfg = WALLPAPER_CONFIG;
+        const cfg = CONFIG.wallpaper;
 
         if (cfg.mode === 'default') return;
 
