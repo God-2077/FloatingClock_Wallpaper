@@ -8,40 +8,125 @@
 		{
 			"carouselinterval" : 
 			{
-				"index" : 3,
-				"order" : 103,
+				"index" : 4,
+				"order" : 104,
 				"text" : "轮播间隔（毫秒）",
 				"type" : "textinput",
 				"value" : "60000"
 			},
 			"carouselurls" : 
 			{
-				"index" : 2,
-				"order" : 102,
+				"index" : 3,
+				"order" : 103,
 				"text" : "轮播URL列表（逗号分隔）",
 				"type" : "textinput",
 				"value" : "https://t.alcy.cc/ycy"
 			},
 			"hitokotoautorefresh" : 
 			{
-				"index" : 4,
-				"order" : 104,
+				"index" : 5,
+				"order" : 105,
 				"text" : "一言自动刷新",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokotorefreshinterval" : 
 			{
-				"index" : 5,
-				"order" : 105,
+				"index" : 6,
+				"order" : 106,
 				"text" : "一言刷新间隔（毫秒）",
 				"type" : "textinput",
 				"value" : "60000"
 			},
+            "hitokototypea": {
+                "index": 9,
+                "order": 109,
+                "text": "动画",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypeb": {
+                "index": 10,
+                "order": 110,
+                "text": "漫画",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypec": {
+                "index": 11,
+                "order": 111,
+                "text": "游戏",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototyped": {
+                "index": 12,
+                "order": 112,
+                "text": "文学",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypee": {
+                "index": 13,
+                "order": 113,
+                "text": "原创",
+                "type": "bool",
+                "value": false
+            },
+            "hitokototypef": {
+                "index": 14,
+                "order": 114,
+                "text": "来自网络",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypeh": {
+                "index": 15,
+                "order": 115,
+                "text": "影视",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypei": {
+                "index": 16,
+                "order": 116,
+                "text": "诗词",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypej": {
+                "index": 17,
+                "order": 117,
+                "text": "网易云",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypek": {
+                "index": 18,
+                "order": 118,
+                "text": "哲学",
+                "type": "bool",
+                "value": true
+            },
+            "hitokototypel": {
+                "index": 19,
+                "order": 119,
+                "text": "抖机灵",
+                "type": "bool",
+                "value": true
+            },
+			"hitokototypetitle" : 
+			{
+				"index" : 8,
+				"order" : 108,
+				"text" : "<h4>⚙️ 一言设置(句子类型)</h4>",
+				"type" : "text",
+				"value" : false
+			},
 			"onlineurl" : 
 			{
-				"index" : 1,
-				"order" : 101,
+				"index" : 2,
+				"order" : 102,
 				"text" : "在线壁纸URL",
 				"type" : "textinput",
 				"value" : ""
@@ -53,13 +138,21 @@
 				"type" : "color",
 				"value" : "0 1 1"
 			},
+			"settings" : 
+			{
+				"index" : 0,
+				"order" : 100,
+				"text" : "<h3>⚙️ 设置</h3>",
+				"type" : "text",
+				"value" : false
+			},
 			"uiscale" : 
 			{
 				"fraction" : true,
-				"index" : 6,
+				"index" : 7,
 				"max" : 2,
 				"min" : 0.5,
-				"order" : 106,
+				"order" : 107,
 				"precision" : 2,
 				"step" : 0.1,
 				"text" : "UI缩放比例",
@@ -68,7 +161,7 @@
 			},
 			"wallpapermode" : 
 			{
-				"index" : 0,
+				"index" : 1,
 				"options" : 
 				[
 					{
@@ -84,7 +177,7 @@
 						"value" : "carousel"
 					}
 				],
-				"order" : 100,
+				"order" : 101,
 				"text" : "壁纸模式",
 				"type" : "combo",
 				"value" : "carousel"
@@ -98,7 +191,7 @@
 	"snapshotoverlay" : "",
 	"tags" : [ "Anime" ],
 	"title" : "二次元随机壁纸（随机-可自定义）",
-	"type" : "Web",
+	"type" : "web",
 	"version" : 2,
 	"visibility" : "public",
 	"workshopid" : "3758991075",

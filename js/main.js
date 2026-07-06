@@ -9,6 +9,19 @@ let CONFIG = {
         autoRefresh: {
             enabled: true,
             autoRefreshInterval: 1000 * 60,
+        },
+        types: {
+            a: true,
+            b: true,
+            c: true,
+            d: true,
+            e: false,
+            f: true,
+            h: true,
+            i: true,
+            j: true,
+            k: true,
+            l: true,
         }
     },
     ui: {
@@ -77,19 +90,24 @@ let CONFIG = {
                 hitokotoEl.classList.add('loading');
             }
 
-            const params = [
-                ['c', 'a'],
-                ['c', 'b'],
-                ['c', 'c'],
-                ['c', 'd'],
-                ['c', 'f'],
-                ['c', 'h'],
-                ['c', 'i'],
-                ['c', 'j'],
-                ['c', 'k'],
-                ['c', 'l'],
-                ['encode', 'json']
-            ];
+            var types = CONFIG.hitokoto.types;
+            var typeKeys = Object.keys(types);
+            var enabledTypes = [];
+            for (var i = 0; i < typeKeys.length; i++) {
+                if (types[typeKeys[i]]) {
+                    enabledTypes.push(typeKeys[i]);
+                }
+            }
+            if (enabledTypes.length === 0) {
+                enabledTypes = typeKeys;
+                console.warn('一言: 未选择任何句子类型，使用全部类型');
+            }
+
+            var params = [];
+            for (var j = 0; j < enabledTypes.length; j++) {
+                params.push(['c', enabledTypes[j]]);
+            }
+            params.push(['encode', 'json']);
 
             const searchParams = new URLSearchParams(params);
             const baseApi = new URL('https://v1.hitokoto.cn/');
@@ -401,12 +419,24 @@ let CONFIG = {
                 needsUIScaleUpdate = true;
             }
 
+            var needsHitokotoRefresh = false;
+            var typePropKeys = Object.keys(CONFIG.hitokoto.types);
+            for (var ti = 0; ti < typePropKeys.length; ti++) {
+                var propName = 'hitokototype' + typePropKeys[ti];
+                if (properties[propName] !== undefined) {
+                    CONFIG.hitokoto.types[typePropKeys[ti]] = properties[propName].value;
+                    needsHitokotoRestart = true;
+                    needsHitokotoRefresh = true;
+                }
+            }
+
             if (!initialized) {
                 initAll();
             } else {
                 if (needsWallpaperRestart) startWallpaper();
                 if (needsHitokotoRestart) resetAutoRefresh();
                 if (needsUIScaleUpdate) applyUIScale();
+                if (needsHitokotoRefresh) fetchHitokoto(true);
             }
         }
     };
