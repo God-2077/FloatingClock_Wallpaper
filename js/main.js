@@ -109,6 +109,12 @@ let CONFIG = {
     let autoRefreshTimer = null;
     let preloadedHitokoto = null;  // 预加载的一言数据
     let initialized = false;
+    let paused = false;
+    let hitokotoPending = false;
+    let carouselPending = false;
+    let _carouselPreload = null;
+    let _carouselTick = null;
+    let _carouselInterval = null;
 
     function applyUIScale() {
         UIEl.style.transform = `scale(${CONFIG.ui.scale})`;
@@ -213,20 +219,21 @@ let CONFIG = {
         }
     }
 
-    // 计时器到时间：切换到预加载的句子
     function onHitokotoTick() {
         if (!CONFIG.hitokoto.autoRefresh.enabled) return;
 
-        // 切换到预加载的句子
         if (preloadedHitokoto) {
             updateHitokoto(preloadedHitokoto, true);
             preloadedHitokoto = null;
         }
 
-        // 预加载下一句
+        if (paused) {
+            hitokotoPending = true;
+            return;
+        }
+
         preloadNextHitokoto();
 
-        // 重新设置计时器
         autoRefreshTimer = setTimeout(onHitokotoTick, CONFIG.hitokoto.autoRefresh.autoRefreshInterval);
     }
 
@@ -454,19 +461,24 @@ let CONFIG = {
             });
         }
 
-        // 计时器到时间：切换到预加载的图片，预加载下一张，重新计时
         function onCarouselTick() {
             if (!carouselRunning) return;
 
-            // 计时器到时间 → 切换到预加载的图片
             switchToPreloaded();
 
-            // 预加载下一张图片
+            if (paused) {
+                carouselPending = true;
+                return;
+            }
+
             preloadNextImage();
 
-            // 重新设置计时器
             carouselTimer = setTimeout(onCarouselTick, interval);
         }
+
+        _carouselPreload = preloadNextImage;
+        _carouselTick = onCarouselTick;
+        _carouselInterval = interval;
 
         // ===== 第一次请求 =====
         var firstUrl = urls[0];
@@ -582,6 +594,20 @@ let CONFIG = {
                 if (needsHitokotoRestart) resetAutoRefresh();
                 if (needsUIScaleUpdate) applyUIScale();
                 if (needsHitokotoRefresh) fetchHitokoto(true);
+            }
+        },
+        setPaused: function(isPaused) {
+            paused = isPaused;
+            if (!isPaused) {
+                if (hitokotoPending) {
+                    hitokotoPending = false;
+                    startAutoRefresh();
+                }
+                if (carouselPending) {
+                    carouselPending = false;
+                    if (_carouselPreload) _carouselPreload();
+                    if (_carouselTick) carouselTimer = setTimeout(_carouselTick, _carouselInterval);
+                }
             }
         }
     };
