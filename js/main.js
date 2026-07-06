@@ -1,15 +1,16 @@
 let CONFIG = {
     wallpaper: {
-        mode: 'carousel',
-        onlineUrl: '',
-        carouselUrls: ['https://t.alcy.cc/ycy'],
-        carouselInterval: 60 * 1000,
+        mode: 'carousel',  // 模式, 可选值: 默认壁纸(default)、轮播图(carousel)、在线壁纸(online)
+        onlineUrl: '',  // 在线壁纸URL, 仅在mode为online时有效
+        carouselUrls: ['https://t.alcy.cc/ycy'],  // 轮播图壁纸URL列表, 仅在mode为carousel时有效，可填入随机壁纸URL
+        carouselInterval: 60 * 1000,  // 轮播图壁纸切换间隔, 单位毫秒, 默认60秒
     },
     hitokoto: {
         autoRefresh: {
             enabled: true,
             autoRefreshInterval: 1000 * 60,
         },
+        // 一言句子类型
         types: {
             a: true,
             b: true,
