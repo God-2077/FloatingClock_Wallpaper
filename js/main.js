@@ -19,14 +19,17 @@ const WALLPAPER_CONFIG = {
 
     const AUTO_REFRESH_INTERVAL = 1000 * 60;
 
-    VanillaTilt.init(clockEl, {
+    const VanillaTiltConfig = {
         max: 2,
         speed: 300,
         scale: 1.01,
         glare: true,
         'max-glare': 0.15,
         perspective: 1000,
-    });
+    }
+
+    VanillaTilt.init(clockEl, VanillaTiltConfig);
+    VanillaTilt.init(hitokotoEl, VanillaTiltConfig);
 
     function updateClock() {
         const now = new Date();
