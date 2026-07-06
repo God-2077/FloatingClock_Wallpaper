@@ -6,7 +6,10 @@ const CONFIG = {
         carouselInterval: 60 * 1000,  // 轮播间隔(ms)
     },
     hitokoto: {
-        autoRefreshInterval: 1000 * 60,
+        autoRefresh: {
+            enabled: true,
+            autoRefreshInterval: 1000 * 60,  // 自动刷新间隔(ms)
+        }
     }
 };
 
@@ -22,7 +25,7 @@ const CONFIG = {
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
 
-    const AUTO_REFRESH_INTERVAL = CONFIG.hitokoto.autoRefreshInterval;
+    const AUTO_REFRESH_INTERVAL = CONFIG.hitokoto.autoRefresh.enabled ? CONFIG.hitokoto.autoRefresh.autoRefreshInterval : 0;
 
     const VanillaTiltConfig = {
         max: 2,
