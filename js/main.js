@@ -10,12 +10,16 @@ const CONFIG = {
             enabled: true,
             autoRefreshInterval: 1000 * 60,  // 自动刷新间隔(ms)
         }
+    },
+    ui:{
+        scale: 0.9,  // UI 缩放比例
     }
 };
 
 (function () {
     'use strict';
 
+    const UIEl = document.getElementById('uiLayer');
     const hoursEl = document.getElementById('hours');
     const minutesEl = document.getElementById('minutes');
     const secondsEl = document.getElementById('seconds');
@@ -38,6 +42,9 @@ const CONFIG = {
 
     VanillaTilt.init(clockEl, VanillaTiltConfig);
     VanillaTilt.init(hitokotoEl, VanillaTiltConfig);
+
+    // UI 缩放
+    UIEl.style.transform = `scale(${CONFIG.ui.scale})`;
 
     function updateClock() {
         const now = new Date();
