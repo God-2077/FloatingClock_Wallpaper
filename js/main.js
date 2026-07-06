@@ -30,17 +30,21 @@ let CONFIG = {
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
     const wallpaperBg = document.querySelector('.wallpaper-bg');
 
-    const VanillaTiltConfig = {
+    VanillaTilt.init(clockEl, {
         max: 2,
         speed: 300,
         scale: 1.01,
         glare: true,
         'max-glare': 0.15,
         perspective: 1000,
-    };
-
-    VanillaTilt.init(clockEl, VanillaTiltConfig);
-    VanillaTilt.init(hitokotoEl, VanillaTiltConfig);
+    });
+    VanillaTilt.init(hitokotoEl, {
+        max: 2,
+        speed: 300,
+        scale: 1.01,
+        glare: false,
+        perspective: 1000,
+    });
 
     let carouselRunning = false;
     let carouselTimer = null;
