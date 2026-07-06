@@ -3,7 +3,7 @@ let CONFIG = {
         mode: 'carousel',  // 模式, 可选值: 默认壁纸(default)、轮播图(carousel)、在线壁纸(online)
         onlineUrl: '',  // 在线壁纸URL, 仅在mode为online时有效
         carouselUrls: ['https://t.alcy.cc/ycy'],  // 轮播图壁纸URL列表, 仅在mode为carousel时有效，可填入随机壁纸URL
-        carouselInterval: 60 * 1000,  // 轮播图壁纸切换间隔, 单位毫秒, 默认60秒
+        carouselInterval: 6 * 1000,  // 轮播图壁纸切换间隔, 单位毫秒, 默认60秒
     },
     hitokoto: {
         autoRefresh: {
@@ -258,7 +258,9 @@ let CONFIG = {
     function preloadImage(url) {
         return new Promise(function (resolve, reject) {
             var img = new Image();
-            img.onload = function () { resolve(img); };
+            img.onload = function () {
+                img.decode().then(function () { resolve(img); }).catch(function () { resolve(img); });
+            };
             img.onerror = function () { reject(new Error('Failed to load image')); };
             img.src = url;
         });
@@ -352,6 +354,7 @@ let CONFIG = {
 
         preloadImage(cfg.onlineUrl).then(function (img) {
             wallpaperBg.style.backgroundImage = "url('" + img.src + "')";
+            void wallpaperBg.offsetHeight;
             wallpaperBg.style.opacity = '1';
             console.log('在线壁纸已加载');
         }).catch(function (err) {
@@ -398,6 +401,7 @@ let CONFIG = {
 
                 if (firstLoad) {
                     currentBg.style.backgroundImage = "url('" + img.src + "')";
+                    void currentBg.offsetHeight;
                     currentBg.style.opacity = '1';
                     firstLoad = false;
                     handleResult();
