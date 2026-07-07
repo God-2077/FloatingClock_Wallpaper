@@ -42,6 +42,7 @@ let CONFIG = {
     const hitokotoText = document.getElementById('hitokotoText');
     const hitokotoFrom = document.getElementById('hitokotoFrom');
     const hitokotoWrapper = document.getElementById('hitokotoWrapper');
+    const wallpaperContainer = document.querySelector('.wallpaper');
     const wallpaperBg = document.querySelector('.wallpaper-bg');
     // 一言加载失败，使用备用句子
     const fallbackHitokotoItems = [
@@ -308,33 +309,38 @@ let CONFIG = {
         });
     }
 
-    function crossfade(fromEl, imgUrl) {
+    function mountHiddenBg(imgUrl) {
+        var div = document.createElement('div');
+        div.className = 'wallpaper-bg';
+        div.style.backgroundImage = "url('" + imgUrl + "')";
+        div.style.opacity = '0';
+        div.style.zIndex = '1';
+        div.style.transition = 'none';
+
+        wallpaperContainer.appendChild(div);
+        void div.offsetHeight;
+        div.style.transition = '';
+
+        return div;
+    }
+
+    function crossfade(fromEl, nextEl) {
         return new Promise(function (resolve) {
-            var nextBg = document.createElement('div');
-            nextBg.className = 'wallpaper-bg';
-            nextBg.style.backgroundImage = "url('" + imgUrl + "')";
-            nextBg.style.opacity = '0';
-            nextBg.style.zIndex = '1';
-            nextBg.style.transition = 'none';
-
+            nextEl.style.zIndex = '1';
             fromEl.style.zIndex = '0';
-            fromEl.parentNode.appendChild(nextBg);
 
-            void nextBg.offsetHeight;
-
-            nextBg.style.transition = '';
-            nextBg.style.opacity = '1';
             fromEl.style.opacity = '0';
+            nextEl.style.opacity = '1';
 
             var resolved = false;
             function done() {
                 if (resolved) return;
                 resolved = true;
                 fromEl.remove();
-                resolve(nextBg);
+                resolve(nextEl);
             }
 
-            nextBg.addEventListener('transitionend', function (e) {
+            nextEl.addEventListener('transitionend', function (e) {
                 if (e.propertyName === 'opacity') done();
             });
 
@@ -394,10 +400,13 @@ let CONFIG = {
             return;
         }
 
+        currentBg = wallpaperBg;
+
         preloadImage(cfg.onlineUrl).then(function (img) {
-            wallpaperBg.style.backgroundImage = "url('" + img.src + "')";
-            void wallpaperBg.offsetHeight;
-            wallpaperBg.style.opacity = '1';
+            var nextBg = mountHiddenBg(img.src);
+            crossfade(currentBg, nextBg).then(function (newBg) {
+                currentBg = newBg;
+            });
             console.log('在线壁纸已加载');
         }).catch(function (err) {
             console.warn('在线壁纸加载失败，使用默认壁纸', err);
@@ -424,7 +433,7 @@ let CONFIG = {
         var interval = cfg.carouselInterval || 30000;
         currentBg = wallpaperBg;
         carouselRunning = true;
-        var preloadedImg = null;   // 预加载好的图片
+        var preloadedEl = null;   // 预加载好的隐藏 DOM 元素
         var nextIndex = 0;         // 下一个要预加载的图片索引
 
         function getCacheBustUrl(url) {
@@ -435,28 +444,27 @@ let CONFIG = {
         // 切换到预加载好的图片（crossfade）
         function switchToPreloaded() {
             if (!carouselRunning) return;
-            if (!preloadedImg) return;
+            if (!preloadedEl) return;
 
-            crossfade(currentBg, preloadedImg.src).then(function (newBg) {
+            crossfade(currentBg, preloadedEl).then(function (newBg) {
                 currentBg = newBg;
             });
-            preloadedImg = null;
+            preloadedEl = null;
         }
 
-        // 预加载下一张图片
+        // 预加载下一张图片，并挂载为隐藏 DOM 元素
         function preloadNextImage() {
             if (!carouselRunning) return;
             var url = urls[nextIndex];
             var cacheBustUrl = getCacheBustUrl(url);
 
             preloadImage(cacheBustUrl).then(function (img) {
-                preloadedImg = img;
+                preloadedEl = mountHiddenBg(img.src);
                 console.log('轮播: 预加载完成 [' + (nextIndex + 1) + '/' + urls.length + ']');
                 nextIndex = (nextIndex + 1) % urls.length;
             }).catch(function (err) {
                 console.warn('轮播: 预加载失败 [' + nextIndex + '] ' + url, err);
                 nextIndex = (nextIndex + 1) % urls.length;
-                // 重试预加载下一张
                 preloadNextImage();
             });
         }
@@ -487,16 +495,14 @@ let CONFIG = {
         preloadImage(firstCacheBustUrl).then(function (img) {
             if (!carouselRunning) return;
 
-            // 显示第一张图片
-            currentBg.style.backgroundImage = "url('" + img.src + "')";
-            void currentBg.offsetHeight;
-            currentBg.style.opacity = '1';
+            var firstBg = mountHiddenBg(img.src);
+            crossfade(currentBg, firstBg).then(function (newBg) {
+                currentBg = newBg;
+            });
             console.log('轮播 [' + 1 + '/' + urls.length + ']');
 
-            // 下一张从索引1开始预加载
             nextIndex = 1 % urls.length;
 
-            // 计时器开始 → 预加载下一张
             preloadNextImage();
             carouselTimer = setTimeout(onCarouselTick, interval);
         }).catch(function (err) {
@@ -598,6 +604,7 @@ let CONFIG = {
         },
         setPaused: function(isPaused) {
             paused = isPaused;
+            console.log('setPaused: ', isPaused);
             if (!isPaused) {
                 if (hitokotoPending) {
                     hitokotoPending = false;
