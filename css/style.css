@@ -126,6 +126,7 @@ body {
     border-radius: 0.2em;
     background: rgba(0, 0, 0, 0.08);
     transform-style: preserve-3d;
+    position: relative;
     pointer-events: auto;
 }
 

@@ -27,6 +27,8 @@ let CONFIG = {
     },
     ui: {
         scale: 0.9,
+        clockoffsety: 1,
+        hitokotooffsety: 1,
     }
 };
 
@@ -119,6 +121,17 @@ let CONFIG = {
 
     function applyUIScale() {
         UIEl.style.transform = `scale(${CONFIG.ui.scale})`;
+    }
+
+    function applyOffsets() {
+        if (clockEl) {
+            clockEl.style.position = 'relative';
+            clockEl.style.top = ((CONFIG.ui.clockoffsety - 1) * 10 * 5) + 'vh';
+        }
+        if (hitokotoEl) {
+            hitokotoEl.style.position = 'relative';
+            hitokotoEl.style.top = ((CONFIG.ui.hitokotooffsety - 1) * 10 * 5) + 'vh';
+        }
     }
 
     function updateClock() {
@@ -522,6 +535,7 @@ let CONFIG = {
         if (initialized) return;
         initialized = true;
         applyUIScale();
+        applyOffsets();
         startWallpaper();
         fetchHitokoto();
         startAutoRefresh();
@@ -580,6 +594,16 @@ let CONFIG = {
             if (properties.uiscale) {
                 CONFIG.ui.scale = properties.uiscale.value;
                 needsUIScaleUpdate = true;
+            }
+
+            if (properties.clockoffsety) {
+                CONFIG.ui.clockoffsety = properties.clockoffsety.value;
+                applyOffsets();
+            }
+
+            if (properties.hitokotooffsety) {
+                CONFIG.ui.hitokotooffsety = properties.hitokotooffsety.value;
+                applyOffsets();
             }
 
             var needsHitokotoRefresh = false;
