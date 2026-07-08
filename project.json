@@ -22,6 +22,19 @@
 				"type" : "textinput",
 				"value" : "https://t.alcy.cc/ycy"
 			},
+			"clockoffsety" : 
+			{
+				"fraction" : true,
+				"index" : 8,
+				"max" : 2,
+				"min" : 0,
+				"order" : 108,
+				"precision" : 3,
+				"step" : 0.01,
+				"text" : "时钟y轴位置",
+				"type" : "slider",
+				"value" : 1
+			},
 			"hitokotoautorefresh" : 
 			{
 				"index" : 5,
@@ -29,6 +42,19 @@
 				"text" : "一言自动刷新",
 				"type" : "bool",
 				"value" : true
+			},
+			"hitokotooffsety" : 
+			{
+				"fraction" : true,
+				"index" : 9,
+				"max" : 2,
+				"min" : 0,
+				"order" : 109,
+				"precision" : 3,
+				"step" : 0.01,
+				"text" : "一言y轴位置",
+				"type" : "slider",
+				"value" : 1
 			},
 			"hitokotorefreshinterval" : 
 			{
@@ -40,96 +66,96 @@
 			},
 			"hitokototypea" : 
 			{
-				"index" : 9,
-				"order" : 109,
+				"index" : 11,
+				"order" : 111,
 				"text" : "动画",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypeb" : 
 			{
-				"index" : 10,
-				"order" : 110,
+				"index" : 12,
+				"order" : 112,
 				"text" : "漫画",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypec" : 
 			{
-				"index" : 11,
-				"order" : 111,
+				"index" : 13,
+				"order" : 113,
 				"text" : "游戏",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototyped" : 
 			{
-				"index" : 12,
-				"order" : 112,
+				"index" : 14,
+				"order" : 114,
 				"text" : "文学",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypee" : 
 			{
-				"index" : 13,
-				"order" : 113,
+				"index" : 15,
+				"order" : 115,
 				"text" : "原创",
 				"type" : "bool",
-				"value" : false
+				"value" : true
 			},
 			"hitokototypef" : 
 			{
-				"index" : 14,
-				"order" : 114,
+				"index" : 16,
+				"order" : 116,
 				"text" : "来自网络",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypeh" : 
 			{
-				"index" : 15,
-				"order" : 115,
+				"index" : 17,
+				"order" : 117,
 				"text" : "影视",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypei" : 
 			{
-				"index" : 16,
-				"order" : 116,
+				"index" : 18,
+				"order" : 118,
 				"text" : "诗词",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypej" : 
 			{
-				"index" : 17,
-				"order" : 117,
+				"index" : 19,
+				"order" : 119,
 				"text" : "网易云",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypek" : 
 			{
-				"index" : 18,
-				"order" : 118,
+				"index" : 20,
+				"order" : 120,
 				"text" : "哲学",
 				"type" : "bool",
 				"value" : true
 			},
 			"hitokototypel" : 
 			{
-				"index" : 19,
-				"order" : 119,
+				"index" : 21,
+				"order" : 121,
 				"text" : "抖机灵",
 				"type" : "bool",
-				"value" : true
+				"value" : false
 			},
 			"hitokototypetitle" : 
 			{
-				"index" : 8,
-				"order" : 108,
+				"index" : 10,
+				"order" : 110,
 				"text" : "<h4>⚙️ 一言设置(句子类型)</h4>",
 				"type" : "text",
 				"value" : false
